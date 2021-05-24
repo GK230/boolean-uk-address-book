@@ -127,32 +127,17 @@ function listenNewContactButton() {
 
   btn.addEventListener("click", function () {
     // [TODO] Write Code
-
-      renderNewContactForm();
-    })
- 
-
-
-}
-
-// var something = (function() {
-//   var executed = false;
-//   return function() {
-//       if (!executed) {
-//           executed = true;
-//           // do something
-//       }
-//   };
-// })();
+    renderNewContactForm();
+  })
+ }
 
 // [TODO] Write Code
-
-
 function renderNewContactForm() {
+
+  viewSection.innerHTML = ""
 
   const newContactFormEl = document.createElement('form')
   newContactFormEl.classList.add('form-stack', 'light-shadow', 'center', 'contact-form')
-  newContactFormEl.innerHTML = ""
 
   const h1El = document.createElement('h1')
   h1El.innerText = "Create Contact"
@@ -228,6 +213,12 @@ function renderNewContactForm() {
 
   newContactFormEl.append(h1El, firstNameLabelEl, firstNameInputEl, lastNameLabelEl, lastNameInputEl, streetInputLabelEl, streetInputEl, cityInputLabelEl,
     cityInputEl, postCodeInputLabelEl, postCodeInputEl, divBlockEl, actionsDivEl)
+  
+  newContactFormEl.addEventListener('submit', function (event) {
+    event.preventDefault()
+    getNewContactFormInput(event)
+  })
+  newContactFormEl.reset()
 
   const viewSectionEl = document.querySelector('.view-section')
   viewSectionEl.append(newContactFormEl)
@@ -235,8 +226,29 @@ function renderNewContactForm() {
 }
 
 function getNewContactFormInput() {
-  
+
+  const firstName = event.target['first-name-input'].value
+  const lastName = event.target['last-name-input'].value
+  const street = event.target['street-input'].value
+  const city = event.target['city-input'].value
+  const postCode = event.target['post-code-input'].value
+  const blockContact;
+  const block = document.querySelector("#block-checkbox");
+    if (block.checked) {
+      blockContact === true;
+    } else {
+      blockContact === false;
+    }
+
+    const newContact = {
+      firstName: firstName,
+      lastName: lastName,
+      blockContact: Boolean,
+      
+    }
 }
+
+
 
 
 
