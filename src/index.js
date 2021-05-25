@@ -115,6 +115,7 @@ function renderContactListItem(contact) {
 
   editBtn.addEventListener("click", function () {
     // [TODO] Write Code
+    createEditForm(contact)
   });
 
   listItemEl.append(editBtn);
@@ -217,8 +218,9 @@ function renderNewContactForm() {
   newContactFormEl.addEventListener('submit', function (event) {
     event.preventDefault()
     getNewContactFormInput(event)
-  })
-  newContactFormEl.reset()
+    newContactFormEl.reset()
+
+})
 
   const viewSectionEl = document.querySelector('.view-section')
   viewSectionEl.append(newContactFormEl)
@@ -232,25 +234,168 @@ function getNewContactFormInput() {
   const street = event.target['street-input'].value
   const city = event.target['city-input'].value
   const postCode = event.target['post-code-input'].value
-  const blockContact;
-  const block = document.querySelector("#block-checkbox");
+  let blockContact = new Boolean(true);
+  let block = document.querySelector("#block-checkbox");
     if (block.checked) {
-      blockContact === true;
+      blockContact = true;
     } else {
-      blockContact === false;
+      blockContact = false;
     }
 
-    const newContact = {
-      firstName: firstName,
-      lastName: lastName,
-      blockContact: Boolean,
-      
+    const newAddress = {
+      "street": street,
+      "city": city,
+      "postCode": postCode
     }
+
+    let newContact = {
+      "firstName": firstName,
+      "lastName": lastName,
+      "blockContact": blockContact,
+      "addressId": null
+    }
+
+    
+    
+
+    fetch('http://localhost:3000/addresses', {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newAddress)
+    }).then(function(response) {
+      return response.json()
+    }).then(function(address) {
+      newContact.addressId = address.id
+      fetch('http://localhost:3000/contacts', {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newContact)
+    }).then(function(response) {
+      return response.json()
+    }).then(function(latestContact) {
+
+      latestContact.address = newAddress
+      state.contacts.push(latestContact)
+      state.selectedContact = latestContact
+      renderContactView()
+      
+  })
+})
 }
 
+ 
 
 
 
+function createEditForm(contact) {
+
+  viewSection.innerHTML = ""
+
+  const editContactFormEl = document.createElement('form')
+  editContactFormEl.classList.add('form-stack', 'light-shadow', 'center', 'contact-form')
+
+  const h1El = document.createElement('h1')
+  h1El.innerText = "Edit Contact"
+
+  const firstNameLabelEl = document.createElement('label')
+  firstNameLabelEl.setAttribute('for', "first-name-input")
+  firstNameLabelEl.innerText = "First Name:"
+
+  const firstNameInputEl = document.createElement('input')
+  firstNameInputEl.setAttribute('id', "first-name-input")
+  firstNameInputEl.setAttribute('name', "first-name-input")
+  firstNameInputEl.setAttribute('type', "text")
+  firstNameInputEl.setAttribute('placeholder', contact.firstName)
+
+
+  const lastNameLabelEl = document.createElement('label')
+  lastNameLabelEl.setAttribute('for', "last-name-input")
+  lastNameLabelEl.innerText = "Last Name:"
+
+  const lastNameInputEl = document.createElement('input')
+  lastNameInputEl.setAttribute('id', "last-name-input")
+  lastNameInputEl.setAttribute('name', "last-name-input")
+  lastNameInputEl.setAttribute('type', "text")
+  lastNameInputEl.setAttribute('placeholder', contact.lastName)
+
+
+  const streetInputLabelEl = document.createElement('label')
+  streetInputLabelEl.setAttribute('for', "street-input")
+  streetInputLabelEl.innerText = 'Street:'
+
+  const streetInputEl = document.createElement('input')
+  streetInputEl.setAttribute('id', "street-input")
+  streetInputEl.setAttribute('name', "street-input")
+  streetInputEl.setAttribute('type', "text")
+  streetInputEl.setAttribute('placeholder', contact.address.street)
+
+
+  const cityInputLabelEl = document.createElement('label')
+  cityInputLabelEl.setAttribute('for', "city-input")
+  cityInputLabelEl.innerText = 'City:'
+
+  const cityInputEl = document.createElement('input')
+  cityInputEl.setAttribute('id', "city-input")
+  cityInputEl.setAttribute('name', "city-input")
+  cityInputEl.setAttribute('type', "text")
+  cityInputEl.setAttribute('placeholder', contact.address.city)
+
+
+  const postCodeInputLabelEl = document.createElement('label')
+  postCodeInputLabelEl.setAttribute('for', "post-code-input")
+  postCodeInputLabelEl.innerText = 'Post Code:'
+
+  const postCodeInputEl = document.createElement('input')
+  postCodeInputEl.setAttribute('id', "post-code-input")
+  postCodeInputEl.setAttribute('name', "post-code-input")
+  postCodeInputEl.setAttribute('type', "text")
+  cityInputEl.setAttribute('placeholder', contact.address.postCode)
+
+
+  const divBlockEl = document.createElement('div')
+  divBlockEl.setAttribute('class', "checkbox-section")
+
+  const blockCheckBoxEl = document.createElement('input')
+  blockCheckBoxEl.setAttribute('id', "block-checkbox")
+  blockCheckBoxEl.setAttribute('name', "block-checkbox")
+  blockCheckBoxEl.setAttribute('type', "checkbox")
+
+  const blockCheckBoxLabelEl = document.createElement('label')
+  blockCheckBoxLabelEl.setAttribute("for", "block-checkbox")
+  blockCheckBoxLabelEl.innerText = 'Block'
+
+  divBlockEl.append(blockCheckBoxEl, blockCheckBoxLabelEl)
+
+  const actionsDivEl = document.createElement('div')
+  actionsDivEl.setAttribute('class', "actions-section")
+
+  const actionsButtonEl = document.createElement('button')
+  actionsButtonEl.classList.add("button", "blue")
+  actionsButtonEl.setAttribute('type', "submit")
+  actionsButtonEl.innerText = "Edit"
+
+  actionsDivEl.append(actionsButtonEl)
+
+  editContactFormEl.append(h1El, firstNameLabelEl, firstNameInputEl, lastNameLabelEl, lastNameInputEl, streetInputLabelEl, streetInputEl, cityInputLabelEl,
+    cityInputEl, postCodeInputLabelEl, postCodeInputEl, divBlockEl, actionsDivEl)
+  
+    editContactFormEl.addEventListener('submit', function (event) {
+    event.preventDefault()
+    editContact(event)
+  })
+    
+  const viewSectionEl = document.querySelector('.view-section')
+  viewSectionEl.append(editContactFormEl)
+
+}
+
+function editContact() {
+
+}
 
 
 function main() {
@@ -258,4 +403,4 @@ function main() {
   getContacts();
 }
 
-main();
+main()
