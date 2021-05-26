@@ -281,14 +281,13 @@ function getNewContactFormInput() {
       latestContact.address = newAddress
       state.contacts.push(latestContact)
       state.selectedContact = latestContact
+      console.log(state)
+
       renderContactView()
       
   })
 })
 }
-
- 
-
 
 
 function createEditForm(contact) {
@@ -353,7 +352,7 @@ function createEditForm(contact) {
   postCodeInputEl.setAttribute('id', "post-code-input")
   postCodeInputEl.setAttribute('name', "post-code-input")
   postCodeInputEl.setAttribute('type', "text")
-  cityInputEl.setAttribute('placeholder', contact.address.postCode)
+  postCodeInputEl.setAttribute('placeholder', contact.address.postCode)
 
 
   const divBlockEl = document.createElement('div')
@@ -377,23 +376,107 @@ function createEditForm(contact) {
   actionsButtonEl.classList.add("button", "blue")
   actionsButtonEl.setAttribute('type', "submit")
   actionsButtonEl.innerText = "Edit"
+  actionsButtonEl.addEventListener("click", function() {
+    getEditFormData()
+  })
 
-  actionsDivEl.append(actionsButtonEl)
+  const deleteButtonEl = document.createElement('button')
+  deleteButtonEl.classList.add("button", "blue")
+  deleteButtonEl.setAttribute('type', "submit")
+  deleteButtonEl.innerText = "Delete"
+  deleteButtonEl.addEventListener('click', function() {
+    deleteContact(contact)
+  })
+
+  actionsDivEl.append(actionsButtonEl, deleteButtonEl)
 
   editContactFormEl.append(h1El, firstNameLabelEl, firstNameInputEl, lastNameLabelEl, lastNameInputEl, streetInputLabelEl, streetInputEl, cityInputLabelEl,
     cityInputEl, postCodeInputLabelEl, postCodeInputEl, divBlockEl, actionsDivEl)
-  
-    editContactFormEl.addEventListener('submit', function (event) {
-    event.preventDefault()
-    editContact(event)
-  })
     
   const viewSectionEl = document.querySelector('.view-section')
   viewSectionEl.append(editContactFormEl)
 
 }
 
-function editContact() {
+function getEditFormData() {
+
+  const firstName = event.target['first-name-input'].value
+  const lastName = event.target['last-name-input'].value
+  const street = event.target['street-input'].value
+  const city = event.target['city-input'].value
+  const postCode = event.target['post-code-input'].value
+  let blockContact = new Boolean(true);
+  let block = document.querySelector("#block-checkbox");
+    if (block.checked) {
+      blockContact = true;
+    } else {
+      blockContact = false;
+    }
+
+    const editedAddress = {
+      "street": street,
+      "city": city,
+      "postCode": postCode
+    }
+
+    let editedContact = {
+      "firstName": firstName,
+      "lastName": lastName,
+      "blockContact": blockContact,
+      "addressId": null
+    }
+    return editContact, editedAddress
+
+
+}
+
+// function editContact(editedAddress, editedContact, contact) {
+
+//   console.log(contact)
+
+//   fetch('http://localhost:3000/addresses', {
+//       method: "PUT",
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify(editedAddress)
+//     }).then(function(response) {
+//       return response.json()
+//     }).then(function(address) {
+//       editedContact.addressId = address.id
+//       fetch('http://localhost:3000/contacts', {
+//       method: "PUT",
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify(editedContact)
+//     }).then(function(response) {
+//       return response.json()
+//     }).then(function(latestContact) {
+
+
+
+//       latestContact.address = newAddress
+//       // state.contacts.push(latestContact)
+//       state.selectedContact = latestContact
+//       renderContactView()
+      
+//   })
+// })
+// }
+
+function deleteContact(contact) {
+
+  
+
+  fetch(`http://localhost:3000/contacts${contact.id}`, {
+  method: 'DELETE'
+
+})
+
+  fetch(`http://localhost:3000/addresses${address.id}`, {
+  method: 'DELETE'
+})
 
 }
 
